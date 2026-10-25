@@ -1,0 +1,13 @@
+{
+  "domain": "private_repositories",
+  "name": "Private Repositories",
+  "codeowners": [],
+  "config_flow": true,
+  "dependencies": ["repairs"],
+  "documentation": "https://github.com/homeloom/ha-private-repositories",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/homeloom/ha-private-repositories/issues",
+  "requirements": [],
+  "version": "0.0.0"
+}
