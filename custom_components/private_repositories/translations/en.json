@@ -1,0 +1,214 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Add a GitHub token",
+        "description": "Private Repositories installs and updates custom integrations from GitHub repositories, private ones included. It needs a fine-grained token that can read them.\n\n1. On GitHub, open the [new fine-grained token]({new_token_url}) page.\n2. **Resource owner**: your account, or the organization that owns the repositories.\n3. **Expiration**: up to one year. Home Assistant reminds you before it ends.\n4. **Repository access**: *Only select repositories*, then the repositories to track.\n5. **Permissions**: *Repository permissions* › **Contents**: *Read-only*. Nothing else.\n6. Generate the token, copy it and paste it below.\n\nAn organization may have to approve the token before it works. The token stays in Home Assistant and is only sent to GitHub's API.",
+        "data": {
+          "access_token": "Token"
+        },
+        "data_description": {
+          "access_token": "A fine-grained personal access token, starting with github_pat_."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Replace the GitHub token",
+        "description": "GitHub no longer accepts the token of {account}: it expired or was revoked.\n\nOpen [your tokens]({tokens_url}) on GitHub, open the token, choose **Regenerate token** and a new expiration, then copy the new token and paste it below. If the token no longer exists, create a [new token]({new_token_url}) with **Contents**: *Read-only* on the same repositories.",
+        "data": {
+          "access_token": "Token"
+        },
+        "data_description": {
+          "access_token": "A fine-grained personal access token, starting with github_pat_."
+        }
+      },
+      "reconfigure": {
+        "title": "Replace the GitHub token",
+        "description": "Paste a new token for {account}. It must belong to the same GitHub account and read the same repositories.\n\nTo renew the current token, open [your tokens]({tokens_url}) on GitHub, open the token and choose **Regenerate token**. To start over, create a [new token]({new_token_url}).",
+        "data": {
+          "access_token": "Token"
+        },
+        "data_description": {
+          "access_token": "A fine-grained personal access token, starting with github_pat_."
+        }
+      }
+    },
+    "error": {
+      "not_fine_grained": "Use a fine-grained personal access token, which starts with github_pat_. Classic tokens cannot be limited to reading a few repositories.",
+      "invalid_auth": "GitHub rejects this token. Check that it was copied entirely and has not expired.",
+      "cannot_connect": "GitHub did not answer as expected. Try again in a moment.",
+      "wrong_account": "This token belongs to another GitHub account. Use a token of {account}.",
+      "missing_access": "This token cannot read {repositories}. Give it access to these repositories on GitHub. If a repository was deleted or moved to another owner, remove it from Private Repositories first.",
+      "unknown": "Unexpected error."
+    },
+    "abort": {
+      "already_configured": "This token has already been added.",
+      "reauth_successful": "Token replaced.",
+      "reconfigure_successful": "Token replaced."
+    }
+  },
+  "config_subentries": {
+    "repository": {
+      "entry_type": "Repository",
+      "initiate_flow": {
+        "user": "Add repository"
+      },
+      "step": {
+        "user": {
+          "title": "Add a repository",
+          "description": "Pick a repository the token can read, or type `owner/name`. Updates follow its GitHub releases.\n\nIf its integration is not installed yet, its latest release is installed right away, and a repair offers to restart Home Assistant to load it.",
+          "data": {
+            "repository": "Repository",
+            "prereleases": "Include pre-releases"
+          },
+          "data_description": {
+            "repository": "The repository holding the integration, as owner/name.",
+            "prereleases": "Also offer releases marked as pre-releases on GitHub."
+          }
+        },
+        "install": {
+          "title": "Install {repository}"
+        },
+        "adopt": {
+          "title": "Take over {integration}",
+          "description": "The integration `{integration}` {version} is already installed, but not from `{repository}`. From now on, its updates will come from the releases of `{repository}`.\n\nIf another tool such as HACS manages it, remove it there first: one integration should be updated by one tool only."
+        },
+        "reconfigure": {
+          "title": "Edit {repository}",
+          "data": {
+            "prereleases": "Include pre-releases"
+          },
+          "data_description": {
+            "prereleases": "Also offer releases marked as pre-releases on GitHub."
+          }
+        }
+      },
+      "progress": {
+        "install": "Downloading and checking the latest release of `{repository}`, then installing its integration.\n\nYou can close this dialog: the install goes on, and the repository is tracked once its integration is installed. An integration that is already installed is only taken over once you confirm it here."
+      },
+      "error": {
+        "invalid_repository": "Type the repository as owner/name, or paste its GitHub address.",
+        "not_found": "Repository not found, or the token cannot read it. Add it to the token's repositories on GitHub (an organization may also have to approve the token).",
+        "already_tracked": "This repository is already tracked.",
+        "no_release": "This repository has no release yet. Publish a release on GitHub, then add it.",
+        "only_prereleases": "This repository only has pre-releases. Enable Include pre-releases to add it.",
+        "integration_tracked": "The integration {integration} is already tracked from another repository.",
+        "integration_refused": "The release holds the integration {integration}. Integrations that come with Home Assistant, and Private Repositories itself, cannot be replaced from here.",
+        "integration_unreadable": "custom_components/{integration} already exists, but holds no integration with a readable manifest.json and version. Fix or remove that folder, then try again.",
+        "restarting": "Home Assistant is restarting. Add the repository once it has started again.",
+        "needs_newer_home_assistant": "The latest release needs Home Assistant {minimum} or newer. Update Home Assistant first.",
+        "no_space": "There is not enough free space to install the integration. Free some space, then try again.",
+        "too_large": "The release is over {limit}, too large to download. The repository can attach a smaller zip file to its releases (see the README of Private Repositories).",
+        "invalid_release": "The latest release cannot be installed: {error}",
+        "install_failed": "Nothing was installed: {error}",
+        "invalid_auth": "GitHub no longer accepts the token of this entry: it expired or was revoked. Give it a new token (Home Assistant asks for one), then add the repository again.",
+        "cannot_connect": "GitHub did not answer as expected: {error}",
+        "unknown": "Unexpected error: the logs of Home Assistant say more."
+      },
+      "abort": {
+        "entry_not_loaded": "This token is not working right now: GitHub rejected it or could not be reached. Fix that first, then add repositories.",
+        "already_configured": "This repository is already tracked.",
+        "already_tracked": "This repository is already tracked.",
+        "closed": "The dialog was closed.",
+        "entry_removed": "This token was removed.",
+        "installed": "{name} {version} is installed, and its updates now come from `{repository}`. Restart Home Assistant to load it: a repair offers to do it.",
+        "integration_tracked": "The integration {integration} is already tracked from another repository.",
+        "tracked": "{name} {version} is already installed from `{repository}`: its updates come from there again.",
+        "reconfigure_successful": "Repository updated."
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "reminder_days": "Remind me before the token expires"
+        },
+        "data_description": {
+          "reminder_days": "A repair appears this many days before the token expires."
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "token_expiration": {
+        "name": "Token expiration"
+      }
+    }
+  },
+  "exceptions": {
+    "no_release": {
+      "message": "{repository} has no release to install."
+    },
+    "invalid_version": {
+      "message": "{version} is not a version."
+    },
+    "unknown_version": {
+      "message": "{repository} has no release {version}."
+    },
+    "cannot_check": {
+      "message": "Cannot check the releases of {repository}: {error}"
+    },
+    "install_failed": {
+      "message": "Cannot install {name} {tag}: {error}"
+    },
+    "install_restarting": {
+      "message": "Cannot install {name} {tag}: Home Assistant is restarting. Try again once it has started."
+    },
+    "install_needs_newer_home_assistant": {
+      "message": "Cannot install {name} {tag}: it needs Home Assistant {minimum} or newer."
+    },
+    "install_no_space": {
+      "message": "Cannot install {name} {tag}: there is not enough free space."
+    },
+    "install_too_large": {
+      "message": "Cannot install {name} {tag}: the release is over {limit}, too large to download."
+    },
+    "install_already_installing": {
+      "message": "Cannot install {name} {tag}: it is already being installed, or waiting for another install to end."
+    }
+  },
+  "issues": {
+    "restart_required": {
+      "title": "Restart Home Assistant to load changed integrations",
+      "fix_flow": {
+        "step": {
+          "confirm": {
+            "title": "Restart Home Assistant",
+            "description": "Home Assistant loads {integrations} when it starts again.\n\nThe configuration is checked first. Restart now?"
+          }
+        },
+        "abort": {
+          "invalid_config": "The configuration is invalid, so Home Assistant was not restarted: {error}",
+          "migration_in_progress": "Home Assistant is upgrading its database. Restart once it has finished.",
+          "install_in_progress": "An install is running. Restart once it has finished."
+        }
+      }
+    },
+    "token_expiring": {
+      "title": "GitHub token of {account} expires soon",
+      "fix_flow": {
+        "step": {
+          "renew": {
+            "title": "Renew the GitHub token",
+            "description": "The token of {account} expires on {date}. After that, updates stop.\n\n1. Open [your tokens]({tokens_url}) on GitHub, then this token.\n2. Choose **Regenerate token** and a new expiration (up to one year).\n3. Copy the new token and paste it below.\n\nIts repositories and permissions stay the same. To start over instead, create a [new token]({new_token_url}) with **Contents**: *Read-only* on the same repositories.",
+            "data": {
+              "access_token": "Token"
+            },
+            "data_description": {
+              "access_token": "A fine-grained personal access token, starting with github_pat_."
+            }
+          }
+        },
+        "error": {
+          "not_fine_grained": "Use a fine-grained personal access token, which starts with github_pat_. Classic tokens cannot be limited to reading a few repositories.",
+          "invalid_auth": "GitHub rejects this token. Check that it was copied entirely and has not expired.",
+          "cannot_connect": "GitHub did not answer as expected. Try again in a moment.",
+          "wrong_account": "This token belongs to another GitHub account. Use a token of {account}.",
+          "missing_access": "This token cannot read {repositories}. Give it access to these repositories on GitHub. If a repository was deleted or moved to another owner, remove it from Private Repositories first.",
+          "unknown": "Unexpected error."
+        }
+      }
+    }
+  }
+}

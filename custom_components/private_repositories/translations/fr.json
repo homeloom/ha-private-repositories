@@ -1,0 +1,214 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Ajouter un jeton GitHub",
+        "description": "Private Repositories installe et met à jour des intégrations personnalisées depuis des dépôts GitHub, privés compris. Il lui faut un jeton fine-grained qui peut les lire.\n\n1. Sur GitHub, ouvrez la page [nouveau jeton fine-grained]({new_token_url}).\n2. **Resource owner** : votre compte, ou l'organisation à qui appartiennent les dépôts.\n3. **Expiration** : un an au plus. Home Assistant vous prévient avant la fin.\n4. **Repository access** : *Only select repositories*, puis les dépôts à suivre.\n5. **Permissions** : *Repository permissions* › **Contents** : *Read-only*. Rien d'autre.\n6. Générez le jeton, copiez-le et collez-le ci-dessous.\n\nUne organisation peut devoir approuver le jeton avant qu'il fonctionne. Le jeton reste dans Home Assistant et n'est envoyé qu'à l'API de GitHub.",
+        "data": {
+          "access_token": "Jeton"
+        },
+        "data_description": {
+          "access_token": "Un jeton d'accès personnel fine-grained, qui commence par github_pat_."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Remplacer le jeton GitHub",
+        "description": "GitHub n'accepte plus le jeton de {account} : il a expiré ou a été révoqué.\n\nOuvrez [vos jetons]({tokens_url}) sur GitHub, ouvrez le jeton, choisissez **Regenerate token** et une nouvelle expiration, puis copiez le nouveau jeton et collez-le ci-dessous. Si le jeton n'existe plus, créez un [nouveau jeton]({new_token_url}) avec **Contents** : *Read-only* sur les mêmes dépôts.",
+        "data": {
+          "access_token": "Jeton"
+        },
+        "data_description": {
+          "access_token": "Un jeton d'accès personnel fine-grained, qui commence par github_pat_."
+        }
+      },
+      "reconfigure": {
+        "title": "Remplacer le jeton GitHub",
+        "description": "Collez un nouveau jeton pour {account}. Il doit appartenir au même compte GitHub et lire les mêmes dépôts.\n\nPour renouveler le jeton actuel, ouvrez [vos jetons]({tokens_url}) sur GitHub, ouvrez le jeton et choisissez **Regenerate token**. Pour repartir de zéro, créez un [nouveau jeton]({new_token_url}).",
+        "data": {
+          "access_token": "Jeton"
+        },
+        "data_description": {
+          "access_token": "Un jeton d'accès personnel fine-grained, qui commence par github_pat_."
+        }
+      }
+    },
+    "error": {
+      "not_fine_grained": "Utilisez un jeton d'accès personnel fine-grained, qui commence par github_pat_. Un jeton classique ne peut pas être limité à la lecture de quelques dépôts.",
+      "invalid_auth": "GitHub refuse ce jeton. Vérifiez qu'il a été copié en entier et qu'il n'a pas expiré.",
+      "cannot_connect": "GitHub n'a pas répondu comme prévu. Réessayez dans un instant.",
+      "wrong_account": "Ce jeton appartient à un autre compte GitHub. Utilisez un jeton de {account}.",
+      "missing_access": "Ce jeton ne peut pas lire {repositories}. Donnez-lui accès à ces dépôts sur GitHub. Si un dépôt a été supprimé ou transféré à un autre propriétaire, retirez-le d'abord de Private Repositories.",
+      "unknown": "Erreur inattendue."
+    },
+    "abort": {
+      "already_configured": "Ce jeton a déjà été ajouté.",
+      "reauth_successful": "Jeton remplacé.",
+      "reconfigure_successful": "Jeton remplacé."
+    }
+  },
+  "config_subentries": {
+    "repository": {
+      "entry_type": "Dépôt",
+      "initiate_flow": {
+        "user": "Ajouter un dépôt"
+      },
+      "step": {
+        "user": {
+          "title": "Ajouter un dépôt",
+          "description": "Choisissez un dépôt que le jeton peut lire, ou tapez `propriétaire/nom`. Les mises à jour suivent ses releases GitHub.\n\nSi son intégration n'est pas encore installée, sa dernière release est installée tout de suite, et une réparation propose de redémarrer Home Assistant pour la charger.",
+          "data": {
+            "repository": "Dépôt",
+            "prereleases": "Inclure les pré-releases"
+          },
+          "data_description": {
+            "repository": "Le dépôt qui contient l'intégration, sous la forme propriétaire/nom.",
+            "prereleases": "Proposer aussi les releases marquées comme pré-releases sur GitHub."
+          }
+        },
+        "install": {
+          "title": "Installer {repository}"
+        },
+        "adopt": {
+          "title": "Reprendre {integration}",
+          "description": "L'intégration `{integration}` {version} est déjà installée, mais pas depuis `{repository}`. Désormais, ses mises à jour viendront des releases de `{repository}`.\n\nSi un autre outil comme HACS la gère, retirez-la d'abord de cet outil : une intégration ne doit être mise à jour que par un seul outil."
+        },
+        "reconfigure": {
+          "title": "Modifier {repository}",
+          "data": {
+            "prereleases": "Inclure les pré-releases"
+          },
+          "data_description": {
+            "prereleases": "Proposer aussi les releases marquées comme pré-releases sur GitHub."
+          }
+        }
+      },
+      "progress": {
+        "install": "Téléchargement et vérification de la dernière release de `{repository}`, puis installation de son intégration.\n\nVous pouvez fermer cette fenêtre : l'installation continue, et le dépôt est suivi dès que son intégration est installée. Une intégration déjà installée n'est reprise qu'après votre confirmation ici."
+      },
+      "error": {
+        "invalid_repository": "Tapez le dépôt sous la forme propriétaire/nom, ou collez son adresse GitHub.",
+        "not_found": "Dépôt introuvable, ou le jeton ne peut pas le lire. Ajoutez-le aux dépôts du jeton sur GitHub (une organisation peut aussi devoir approuver le jeton).",
+        "already_tracked": "Ce dépôt est déjà suivi.",
+        "no_release": "Ce dépôt n'a encore aucune release. Publiez une release sur GitHub, puis ajoutez-le.",
+        "only_prereleases": "Ce dépôt n'a que des pré-releases. Activez Inclure les pré-releases pour l'ajouter.",
+        "integration_tracked": "L'intégration {integration} est déjà suivie depuis un autre dépôt.",
+        "integration_refused": "La release contient l'intégration {integration}. Les intégrations fournies avec Home Assistant, et Private Repositories lui-même, ne peuvent pas être remplacées d'ici.",
+        "integration_unreadable": "custom_components/{integration} existe déjà, mais ne contient pas d'intégration avec un manifest.json lisible et une version. Corrigez ou supprimez ce dossier, puis réessayez.",
+        "restarting": "Home Assistant redémarre. Ajoutez le dépôt une fois qu'il a redémarré.",
+        "needs_newer_home_assistant": "La dernière release demande Home Assistant {minimum} ou plus récent. Mettez d'abord Home Assistant à jour.",
+        "no_space": "Il n'y a pas assez d'espace libre pour installer l'intégration. Libérez de la place, puis réessayez.",
+        "too_large": "La release dépasse {limit}, elle est trop grande pour être téléchargée. Le dépôt peut joindre un fichier zip plus petit à ses releases (voir le README de Private Repositories).",
+        "invalid_release": "La dernière release ne peut pas être installée : {error}",
+        "install_failed": "Rien n'a été installé : {error}",
+        "invalid_auth": "GitHub n'accepte plus le jeton de cette entrée : il a expiré ou a été révoqué. Donnez-lui un nouveau jeton (Home Assistant en demande un), puis ajoutez de nouveau le dépôt.",
+        "cannot_connect": "GitHub n'a pas répondu comme prévu : {error}",
+        "unknown": "Erreur inattendue : les journaux de Home Assistant en disent plus."
+      },
+      "abort": {
+        "entry_not_loaded": "Ce jeton ne fonctionne pas pour l'instant : GitHub l'a refusé ou n'a pas pu être joint. Réglez d'abord ce problème, puis ajoutez des dépôts.",
+        "already_configured": "Ce dépôt est déjà suivi.",
+        "already_tracked": "Ce dépôt est déjà suivi.",
+        "closed": "La fenêtre a été fermée.",
+        "entry_removed": "Ce jeton a été supprimé.",
+        "installed": "{name} {version} est installée, et ses mises à jour viennent désormais de `{repository}`. Redémarrez Home Assistant pour la charger : une réparation le propose.",
+        "integration_tracked": "L'intégration {integration} est déjà suivie depuis un autre dépôt.",
+        "tracked": "{name} {version} est déjà installée depuis `{repository}` : ses mises à jour en viennent de nouveau.",
+        "reconfigure_successful": "Dépôt modifié."
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "reminder_days": "Me prévenir avant l'expiration du jeton"
+        },
+        "data_description": {
+          "reminder_days": "Une réparation apparaît ce nombre de jours avant l'expiration du jeton."
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "token_expiration": {
+        "name": "Expiration du jeton"
+      }
+    }
+  },
+  "exceptions": {
+    "no_release": {
+      "message": "{repository} n'a aucune release à installer."
+    },
+    "invalid_version": {
+      "message": "{version} n'est pas une version."
+    },
+    "unknown_version": {
+      "message": "{repository} n'a pas de release {version}."
+    },
+    "cannot_check": {
+      "message": "Impossible de consulter les releases de {repository} : {error}"
+    },
+    "install_failed": {
+      "message": "Impossible d'installer {name} {tag} : {error}"
+    },
+    "install_restarting": {
+      "message": "Impossible d'installer {name} {tag} : Home Assistant redémarre. Réessayez une fois qu'il a redémarré."
+    },
+    "install_needs_newer_home_assistant": {
+      "message": "Impossible d'installer {name} {tag} : elle demande Home Assistant {minimum} ou plus récent."
+    },
+    "install_no_space": {
+      "message": "Impossible d'installer {name} {tag} : il n'y a pas assez d'espace libre."
+    },
+    "install_too_large": {
+      "message": "Impossible d'installer {name} {tag} : la release dépasse {limit}, elle est trop grande pour être téléchargée."
+    },
+    "install_already_installing": {
+      "message": "Impossible d'installer {name} {tag} : elle est déjà en cours d'installation, ou attend la fin d'une autre installation."
+    }
+  },
+  "issues": {
+    "restart_required": {
+      "title": "Redémarrez Home Assistant pour charger les intégrations modifiées",
+      "fix_flow": {
+        "step": {
+          "confirm": {
+            "title": "Redémarrer Home Assistant",
+            "description": "Home Assistant chargera {integrations} à son prochain démarrage.\n\nLa configuration sera d'abord vérifiée. Redémarrer maintenant ?"
+          }
+        },
+        "abort": {
+          "invalid_config": "La configuration n'est pas valide, Home Assistant n'a donc pas redémarré : {error}",
+          "migration_in_progress": "Home Assistant met à jour sa base de données. Redémarrez une fois qu'il a fini.",
+          "install_in_progress": "Une installation est en cours. Redémarrez une fois qu'elle est terminée."
+        }
+      }
+    },
+    "token_expiring": {
+      "title": "Le jeton GitHub de {account} expire bientôt",
+      "fix_flow": {
+        "step": {
+          "renew": {
+            "title": "Renouveler le jeton GitHub",
+            "description": "Le jeton de {account} expire le {date}. Ensuite, les mises à jour s'arrêtent.\n\n1. Ouvrez [vos jetons]({tokens_url}) sur GitHub, puis ce jeton.\n2. Choisissez **Regenerate token** et une nouvelle expiration (un an au plus).\n3. Copiez le nouveau jeton et collez-le ci-dessous.\n\nSes dépôts et ses permissions restent les mêmes. Pour repartir de zéro, créez plutôt un [nouveau jeton]({new_token_url}) avec **Contents** : *Read-only* sur les mêmes dépôts.",
+            "data": {
+              "access_token": "Jeton"
+            },
+            "data_description": {
+              "access_token": "Un jeton d'accès personnel fine-grained, qui commence par github_pat_."
+            }
+          }
+        },
+        "error": {
+          "not_fine_grained": "Utilisez un jeton d'accès personnel fine-grained, qui commence par github_pat_. Un jeton classique ne peut pas être limité à la lecture de quelques dépôts.",
+          "invalid_auth": "GitHub refuse ce jeton. Vérifiez qu'il a été copié en entier et qu'il n'a pas expiré.",
+          "cannot_connect": "GitHub n'a pas répondu comme prévu. Réessayez dans un instant.",
+          "wrong_account": "Ce jeton appartient à un autre compte GitHub. Utilisez un jeton de {account}.",
+          "missing_access": "Ce jeton ne peut pas lire {repositories}. Donnez-lui accès à ces dépôts sur GitHub. Si un dépôt a été supprimé ou transféré à un autre propriétaire, retirez-le d'abord de Private Repositories.",
+          "unknown": "Erreur inattendue."
+        }
+      }
+    }
+  }
+}

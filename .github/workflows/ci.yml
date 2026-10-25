@@ -1,0 +1,72 @@
+name: CI
+
+# CI of a Home Assistant integration, built from the shared workflows of
+# homeloom/ci. Branch protection requires the Report job.
+#
+# Draft pull requests run no job, to save Actions minutes: a draft cannot be
+# merged, so a skipped Report holds nothing back. Marking the pull request ready
+# for review runs CI once. Editing the title or body runs it again, because the
+# title becomes the commit message and both are checked for personal data.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, edited]
+  push:
+    branches: [main]
+  # A run started by hand checks the whole history as new.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One group per pull request, where a new push cancels the previous run, and
+# one per commit on main, where every commit must be checked.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  hygiene:
+    if: github.event.pull_request.draft != true
+    uses: homeloom/ci/.github/workflows/hygiene.yml@2866909ad55df5df35925bd666e10669aff82dbb # v0.1.0
+    permissions:
+      contents: read
+      # The hygiene job reads the current pull request title and body.
+      pull-requests: read
+    with:
+      # Session links and noreply commit addresses of AI coding assistants.
+      # Keep only the domains of the assistants that contribute.
+      allowed-domains: anthropic.com claude.ai claude.com
+    # Passes every secret: the denylist is the sum of the secrets whose names
+    # start with PRIVACY_DENYLIST, and only the checks' own code reads them.
+    secrets: inherit
+
+  lint:
+    if: github.event.pull_request.draft != true
+    uses: homeloom/ci/.github/workflows/python-lint.yml@2866909ad55df5df35925bd666e10669aff82dbb # v0.1.0
+
+  tests:
+    if: github.event.pull_request.draft != true
+    uses: homeloom/ci/.github/workflows/ha-tests.yml@2866909ad55df5df35925bd666e10669aff82dbb # v0.1.0
+
+  validate:
+    if: github.event.pull_request.draft != true
+    uses: homeloom/ci/.github/workflows/ha-integration.yml@2866909ad55df5df35925bd666e10669aff82dbb # v0.1.0
+
+  report:
+    name: Report
+    # Runs whatever the other jobs did, except on drafts, so that a cancelled or
+    # failed run shows a failed Report rather than a skipped one, which branch
+    # protection would count as passed.
+    if: ${{ always() && github.event.pull_request.draft != true }}
+    needs: [hygiene, lint, tests, validate]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    permissions: {}
+    steps:
+      - name: Check results
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: |
+          jq -r 'to_entries[] | "\(.key): \(.value.result)"' <<< "$NEEDS"
+          jq -e 'all(.[]; .result == "success")' <<< "$NEEDS" > /dev/null
