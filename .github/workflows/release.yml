@@ -1,0 +1,31 @@
+name: Release
+
+# Publish a release tagged v<manifest version> when CI passes on the commit
+# of main that changes the version, if the tag does not exist yet and the
+# version is greater than every release. The notes come from the matching
+# CHANGELOG.md section.
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+permissions: {}
+
+# One group per commit, so that a run waiting for another is never dropped.
+concurrency:
+  group: release-${{ github.event.workflow_run.head_sha }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    permissions:
+      contents: write
+    uses: homeloom/ci/.github/workflows/release.yml@a0f76324c11738e82bb44b61c2f4746d750cb3b0 # v0.1.1
+    with:
+      sha: ${{ github.event.workflow_run.head_sha }}
