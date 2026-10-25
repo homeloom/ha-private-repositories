@@ -60,7 +60,3 @@ app configuration or `pyproject.toml`) and renames the `Unreleased` section
 to that version. Once it is merged and CI passes on `main`, a release tagged
 `v<version>` is published automatically with that section as release notes.
 Versions follow [Semantic Versioning](https://semver.org/).
-
-This repository has no release workflow yet: the pull request of the first
-release, 0.1.0, adds it. Until then nothing is published, and every change
-stays under `Unreleased`.
