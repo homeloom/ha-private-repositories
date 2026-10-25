@@ -42,6 +42,10 @@ secret.
   stay at or above 95 %. Code is only left out with
   `# pragma: no cover - <reason>` on the line, and lowering the threshold
   needs a written justification in the pull request.
+- Tests must not depend on the machine that runs them. Runners have no git
+  identity, no global git configuration and no secret, so run the suite
+  once with an empty `HOME`, `GIT_CONFIG_NOSYSTEM=1` and no `EMAIL` variable
+  before asking for a review.
 - Linting and formatting use Ruff with the configuration of the repository.
 - Do not add a dependency without checking its license and maintenance
   status. CI rejects licenses outside the allowed list.
