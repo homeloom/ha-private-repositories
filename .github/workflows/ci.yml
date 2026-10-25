@@ -3,10 +3,10 @@ name: CI
 # CI of a Home Assistant integration, built from the shared workflows of
 # homeloom/ci. Branch protection requires the Report job.
 #
-# Draft pull requests run no job, to save Actions minutes: a draft cannot be
-# merged, so a skipped Report holds nothing back. Marking the pull request ready
-# for review runs CI once. Editing the title or body runs it again, because the
-# title becomes the commit message and both are checked for personal data.
+# Draft pull requests run no job at all, which saves runner minutes while the
+# work is in progress. Marking the pull request ready for review runs CI once.
+# Editing the title or body runs it again, because the title becomes the
+# commit message and both are checked for personal data.
 
 on:
   pull_request:
@@ -28,7 +28,7 @@ concurrency:
 jobs:
   hygiene:
     if: github.event.pull_request.draft != true
-    uses: homeloom/ci/.github/workflows/hygiene.yml@2866909ad55df5df35925bd666e10669aff82dbb # v0.1.0
+    uses: homeloom/ci/.github/workflows/hygiene.yml@a0f76324c11738e82bb44b61c2f4746d750cb3b0 # v0.1.1
     permissions:
       contents: read
       # The hygiene job reads the current pull request title and body.
@@ -43,21 +43,22 @@ jobs:
 
   lint:
     if: github.event.pull_request.draft != true
-    uses: homeloom/ci/.github/workflows/python-lint.yml@2866909ad55df5df35925bd666e10669aff82dbb # v0.1.0
+    uses: homeloom/ci/.github/workflows/python-lint.yml@a0f76324c11738e82bb44b61c2f4746d750cb3b0 # v0.1.1
 
   tests:
     if: github.event.pull_request.draft != true
-    uses: homeloom/ci/.github/workflows/ha-tests.yml@2866909ad55df5df35925bd666e10669aff82dbb # v0.1.0
+    uses: homeloom/ci/.github/workflows/ha-tests.yml@a0f76324c11738e82bb44b61c2f4746d750cb3b0 # v0.1.1
 
   validate:
     if: github.event.pull_request.draft != true
-    uses: homeloom/ci/.github/workflows/ha-integration.yml@2866909ad55df5df35925bd666e10669aff82dbb # v0.1.0
+    uses: homeloom/ci/.github/workflows/ha-integration.yml@a0f76324c11738e82bb44b61c2f4746d750cb3b0 # v0.1.1
 
   report:
     name: Report
-    # Runs whatever the other jobs did, except on drafts, so that a cancelled or
-    # failed run shows a failed Report rather than a skipped one, which branch
-    # protection would count as passed.
+    # Runs after failed or cancelled jobs too, so that it fails with them
+    # rather than being skipped, which branch protection counts as passed.
+    # Skipped on drafts like every job: GitHub never merges a draft, and
+    # marking it ready for review starts a full run.
     if: ${{ always() && github.event.pull_request.draft != true }}
     needs: [hygiene, lint, tests, validate]
     runs-on: ubuntu-24.04
