@@ -26,6 +26,6 @@ jobs:
       github.event.workflow_run.head_repository.full_name == github.repository
     permissions:
       contents: write
-    uses: homeloom/ci/.github/workflows/release.yml@a0f76324c11738e82bb44b61c2f4746d750cb3b0 # v0.1.1
+    uses: homeloom/ci/.github/workflows/release.yml@dfb62a948d30fee08785389f5b85e75738784724 # v0.2.2
     with:
       sha: ${{ github.event.workflow_run.head_sha }}
