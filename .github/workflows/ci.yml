@@ -28,7 +28,7 @@ concurrency:
 jobs:
   hygiene:
     if: github.event.pull_request.draft != true
-    uses: homeloom/ci/.github/workflows/hygiene.yml@dfb62a948d30fee08785389f5b85e75738784724 # v0.2.2
+    uses: homeloom/ci/.github/workflows/hygiene.yml@9635bf45f04ac3cc56d4d4c29ab30f4c572d1f14 # v0.2.3
     permissions:
       contents: read
       # The hygiene job reads the current pull request title and body.
@@ -43,15 +43,15 @@ jobs:
 
   lint:
     if: github.event.pull_request.draft != true
-    uses: homeloom/ci/.github/workflows/python-lint.yml@dfb62a948d30fee08785389f5b85e75738784724 # v0.2.2
+    uses: homeloom/ci/.github/workflows/python-lint.yml@9635bf45f04ac3cc56d4d4c29ab30f4c572d1f14 # v0.2.3
 
   tests:
     if: github.event.pull_request.draft != true
-    uses: homeloom/ci/.github/workflows/ha-tests.yml@dfb62a948d30fee08785389f5b85e75738784724 # v0.2.2
+    uses: homeloom/ci/.github/workflows/ha-tests.yml@9635bf45f04ac3cc56d4d4c29ab30f4c572d1f14 # v0.2.3
 
   validate:
     if: github.event.pull_request.draft != true
-    uses: homeloom/ci/.github/workflows/ha-integration.yml@dfb62a948d30fee08785389f5b85e75738784724 # v0.2.2
+    uses: homeloom/ci/.github/workflows/ha-integration.yml@9635bf45f04ac3cc56d4d4c29ab30f4c572d1f14 # v0.2.3
 
   report:
     name: Report
@@ -61,7 +61,9 @@ jobs:
     # marking it ready for review starts a full run.
     if: ${{ always() && github.event.pull_request.draft != true }}
     needs: [hygiene, lint, tests, validate]
-    runs-on: ubuntu-24.04
+    # The same runner as the shared workflows: see "Runners" in the README
+    # of homeloom/ci.
+    runs-on: ${{ fromJSON(vars.CI_RUNS_ON || '"ubuntu-24.04"') }}
     timeout-minutes: 2
     permissions: {}
     steps:
