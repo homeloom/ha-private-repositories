@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- A brand icon, shown by Home Assistant 2026.3 and later, and by HACS.
+
 ## [0.1.0]
 
 ### Added
